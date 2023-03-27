@@ -1,2 +1,4 @@
-package com.example.registrationms.exception;public class ShiftInputException {
+package com.example.registrationms.exception;
+
+public class ShiftInputException extends RuntimeException {
 }

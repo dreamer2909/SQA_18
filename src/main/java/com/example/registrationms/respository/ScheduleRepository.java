@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface LessonRepository extends JpaRepository<Schedule, Integer> {
+public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
     Optional<Schedule> findByShiftAndWeekDayAndWeek(int shift, WeekDay weekDay, int week);
 }

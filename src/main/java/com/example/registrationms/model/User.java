@@ -13,25 +13,20 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name = "_user")
-public class User implements UserDetails {
+@NoArgsConstructor
+@Data
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public abstract class User implements UserDetails {
     @Id @GeneratedValue
     private Integer id;
+    private String code;
     @Column(unique = true)
     private String username;
     @Column(nullable = false)
     private String password;
     @Column(nullable = false)
     private String name;
-    @Column(nullable = false)
-    private LocalDate dob;
-    @Column(nullable = false)
-    private String address;
     @Enumerated(EnumType.STRING)
     private Role role;
 

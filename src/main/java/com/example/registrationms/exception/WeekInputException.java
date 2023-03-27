@@ -1,2 +1,4 @@
-package com.example.registrationms.exception;public class WeekInputException {
+package com.example.registrationms.exception;
+
+public class WeekInputException extends RuntimeException {
 }

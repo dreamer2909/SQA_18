@@ -1,2 +1,4 @@
-package com.example.registrationms.exception;public class WeekDayInputException {
+package com.example.registrationms.exception;
+
+public class WeekDayInputException extends RuntimeException {
 }

@@ -1,8 +1,7 @@
 package com.example.registrationms;
 
-import com.example.registrationms.model.Role;
-import com.example.registrationms.model.User;
-import com.example.registrationms.respository.UserRepository;
+import com.example.registrationms.model.*;
+import com.example.registrationms.respository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -10,11 +9,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 @SpringBootApplication
 @RequiredArgsConstructor
 public class RegistrationMsApplication implements CommandLineRunner {
     private final UserRepository userRepo;
+    private final TeacherRepository teacherRepo;
+    private final SubjectRepository subjectRepo;
+    private final ClassroomRepository classroomRepo;
     private final PasswordEncoder encoder;
 
     public static void main(String[] args) {
@@ -24,14 +27,27 @@ public class RegistrationMsApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // add sample data
-        var teacher = User.builder()
-                .username("MGV001")
-                .password(encoder.encode("12345"))
+        var class1 = Classroom.builder()
+                .name("305-A2")
+                .build();
+
+        var teacher = Teacher.builder()
                 .dob(LocalDate.of(1990, 10, 10))
                 .address("HaNoi")
-                .name("Nguyen Van A")
-                .role(Role.TEACHER)
                 .build();
-        System.out.println(userRepo.save(teacher));
+        teacher.setCode("MGV001");
+        teacher.setName("Nguyen Van A");
+        teacher.setUsername("MGV001");
+        teacher.setPassword(encoder.encode("12345"));
+        teacher.setRole(Role.TEACHER);
+
+        var subject = Subject.builder()
+                .code("SQA")
+                .name("Quản lý chất lượng phần mềm")
+                .numberCredit(123).build();
+
+        subjectRepo.save(subject);
+        teacherRepo.save(teacher);
+        classroomRepo.save(class1);
     }
 }

@@ -2,29 +2,34 @@ package com.example.registrationms.model;
 
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Lesson {
+@Builder
+public class Schedule {
     @Id @GeneratedValue
     private Integer id;
     private WeekDay weekDay;
     private int shift;
-
     private int week;
 
-    @OneToOne
-    @JoinColumn(name = "subject_code", referencedColumnName = "subjectCode")
-    private Subject subject;
+    @ManyToOne
+    @JoinColumn(name = "subject_code")
+    private Course course;
 
-    public Lesson(int week, int weekDay, int shift) {
+    @ManyToOne
+    @JoinColumn(name = "classroom_id")
+    private Classroom room;
+
+    public Schedule(int week, int weekDay, int shift) {
         this.week = week;
         switch (weekDay) {
             case 2:
@@ -48,7 +53,6 @@ public class Lesson {
             default:
                 this.weekDay = WeekDay.UNDEFINED;
         }
-
         this.shift = shift;
     }
 }
