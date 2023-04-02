@@ -1,18 +1,12 @@
 package com.example.registrationms.model;
 
-
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter @Setter
 @Builder
 public class Schedule {
     @Id @GeneratedValue
@@ -22,37 +16,23 @@ public class Schedule {
     private int week;
 
     @ManyToOne
-    @JoinColumn(name = "subject_code")
+    @JoinColumn(name = "course_id")
     private Course course;
 
     @ManyToOne
-    @JoinColumn(name = "classroom_id")
     private Classroom room;
 
     public Schedule(int week, int weekDay, int shift) {
         this.week = week;
-        switch (weekDay) {
-            case 2:
-                this.weekDay = WeekDay.MONDAY;
-                break;
-            case 3:
-                this.weekDay = WeekDay.TUESDAY;
-                break;
-            case 4:
-                this.weekDay = WeekDay.WEDNESDAY;
-                break;
-            case 5:
-                this.weekDay = WeekDay.THURSDAY;
-                break;
-            case 6:
-                this.weekDay = WeekDay.FRIDAY;
-                break;
-            case 7:
-                this.weekDay = WeekDay.SATURDAY;
-                break;
-            default:
-                this.weekDay = WeekDay.UNDEFINED;
-        }
+        this.weekDay = switch (weekDay) {
+            case 2 -> WeekDay.MONDAY;
+            case 3 -> WeekDay.TUESDAY;
+            case 4 -> WeekDay.WEDNESDAY;
+            case 5 -> WeekDay.THURSDAY;
+            case 6 -> WeekDay.FRIDAY;
+            case 7 -> WeekDay.SATURDAY;
+            default -> WeekDay.UNDEFINED;
+        };
         this.shift = shift;
     }
 }

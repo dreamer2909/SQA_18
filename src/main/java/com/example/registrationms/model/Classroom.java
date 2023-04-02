@@ -1,5 +1,6 @@
 package com.example.registrationms.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,5 +22,6 @@ public class Classroom {
     private String name;
 
     @OneToMany(mappedBy = "room")
+    @JsonIgnore
     private List<Schedule> schedules = new ArrayList<>();
 }

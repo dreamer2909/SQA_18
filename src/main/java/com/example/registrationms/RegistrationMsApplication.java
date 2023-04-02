@@ -44,9 +44,15 @@ public class RegistrationMsApplication implements CommandLineRunner {
         var subject = Subject.builder()
                 .code("SQA")
                 .name("Quản lý chất lượng phần mềm")
-                .numberCredit(123).build();
+                .build();
+
+        var subject2 = Subject.builder()
+                .code("OOP")
+                .name("Lap trinh huong doi tuong")
+                .build();
 
         subjectRepo.save(subject);
+        subjectRepo.save(subject2);
         teacherRepo.save(teacher);
         classroomRepo.save(class1);
     }

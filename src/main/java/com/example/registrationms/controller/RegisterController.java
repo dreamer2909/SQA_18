@@ -7,6 +7,7 @@ import com.example.registrationms.exception.DuplicateRegisterException;
 import com.example.registrationms.exception.ShiftInputException;
 import com.example.registrationms.exception.WeekDayInputException;
 import com.example.registrationms.exception.WeekInputException;
+import com.example.registrationms.model.Course;
 import com.example.registrationms.service.TeachingRegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +21,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RegisterController {
     private final TeachingRegisterService registerService;
-    @GetMapping
-    public ResponseEntity<List<CourseDTO>> getAll() {
-        var courses = registerService.getAll();
+    @GetMapping("/{teacherCode}")
+    public ResponseEntity<List<CourseDTO>> getRegister(@PathVariable String teacherCode) {
+        var courses = registerService.getCourses(teacherCode);
         return ResponseEntity.ok(courses);
     }
 

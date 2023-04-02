@@ -1,6 +1,8 @@
 package com.example.registrationms.service;
 
 import com.example.registrationms.dto.CourseDTO;
+import com.example.registrationms.dto.ScheduleDTO;
+import com.example.registrationms.dto.SubjectDTO;
 import com.example.registrationms.dto.TeachingRegisterRequest;
 import com.example.registrationms.exception.DuplicateRegisterException;
 import com.example.registrationms.exception.ShiftInputException;
@@ -12,16 +14,11 @@ import com.example.registrationms.model.WeekDay;
 import com.example.registrationms.respository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class TeachingRegisterService {
     private final ScheduleRepository scheduleRepo;
@@ -39,6 +36,47 @@ public class TeachingRegisterService {
                         course.getSchedules().stream().map(schedule -> schedule.getId()).collect(Collectors.toList())))
                 .toList();
     }
+
+    public List<CourseDTO> getCourses(String teacherCode) {
+        var teacher = teacherRepo.findByTeacherCode(teacherCode);
+        if (teacher.isPresent()) {
+            return teacher.get().getCourses()
+                    .stream()
+                    .map(course -> new CourseDTO(
+                            course.getTeacher().getCode(),
+                            course.getSubject().getCode(),
+                            course.getSchedules().stream().map(schedule -> schedule.getId()).collect(Collectors.toList())
+                    )).toList();
+        }
+        return null;
+    }
+
+    public SubjectDTO getSubject(String subjectCode) {
+        var subject = subjectRepo.getReferenceById(subjectCode);
+        return new SubjectDTO(subject.getCode(), subject.getName());
+    }
+
+    public ScheduleDTO getSchedule(int scheduleId) {
+        var schedule = scheduleRepo.getReferenceById(scheduleId);
+        var scheduleDTO = new ScheduleDTO();
+        scheduleDTO.setRoom(schedule.getRoom());
+        scheduleDTO.setWeek(schedule.getWeek());
+        scheduleDTO.setShift(schedule.getShift());
+
+        var weekDay = switch (schedule.getWeekDay()) {
+            case MONDAY -> 2;
+            case TUESDAY -> 3;
+            case WEDNESDAY -> 4;
+            case THURSDAY -> 5;
+            case FRIDAY -> 6;
+            case SATURDAY -> 7;
+            case UNDEFINED -> 0;
+        };
+
+        scheduleDTO.setWeekDay(weekDay);
+        return scheduleDTO;
+    }
+
     public void register(TeachingRegisterRequest request) {
         var teacher = teacherRepo.findByTeacherCode(request.teacherCode())
                 .orElseThrow();
@@ -56,27 +94,15 @@ public class TeachingRegisterService {
             throw new ShiftInputException();
         }
 
-        WeekDay wDay = WeekDay.UNDEFINED;
-        switch (weekDay) {
-            case 2:
-                wDay = WeekDay.MONDAY;
-                break;
-            case 3:
-                wDay = WeekDay.TUESDAY;
-                break;
-            case 4:
-                wDay = WeekDay.WEDNESDAY;
-                break;
-            case 5:
-                wDay = WeekDay.THURSDAY;
-                break;
-            case 6:
-                wDay = WeekDay.FRIDAY;
-                break;
-            case 7:
-                wDay = WeekDay.SATURDAY;
-                break;
-        }
+        var wDay = switch (weekDay) {
+            case 2 -> WeekDay.MONDAY;
+            case 3 -> WeekDay.TUESDAY;
+            case 4 -> WeekDay.WEDNESDAY;
+            case 5 -> WeekDay.THURSDAY;
+            case 6 -> WeekDay.FRIDAY;
+            case 7 -> WeekDay.SATURDAY;
+            default -> WeekDay.UNDEFINED;
+        };
 
         var schedule = scheduleRepo.findByShiftAndWeekDayAndWeek(shift, wDay, week);
         if (schedule.isPresent()) throw new DuplicateRegisterException();
@@ -87,20 +113,11 @@ public class TeachingRegisterService {
         var course = Course.builder()
                 .name("DEMO")
                 .subject(subject)
-                .teacher(teacher)
                 .build();
-        course = courseRepo.save(course);
 
-        var schedules = getSchedules(course.getId());
-        s = scheduleRepo.save(s);
-        schedules.add(s);
-        course.setSchedules(schedules);
-        courseRepo.save(course);
-    }
+        course.addSchedule(s);
 
-    public List<Schedule> getSchedules(int courseId) {
-        var course = courseRepo.getReferenceById(courseId);
-        if (course.getSchedules() == null || course.getSchedules().isEmpty()) course.setSchedules(new ArrayList<>());
-        return course.getSchedules();
+        teacher.addCourse(course);
+        teacherRepo.save(teacher);
     }
 }
